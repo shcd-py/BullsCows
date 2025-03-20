@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema Renkleri -->
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorSecondary">#673AB7</color>
+    <color name="colorBackground">#ECEFF1</color>
+    <color name="colorSecondaryText">#757575</color>
+
+    <!-- Tahmin Sonucu Renkleri -->
+    <color name="correct_guess">#4CAF50</color>     <!-- 4 Bulls (Doğru tahmin) -->
+    <color name="good_guess">#8BC34A</color>        <!-- 3 Bulls -->
+    <color name="medium_guess">#FFC107</color>      <!-- 2 Bulls -->
+    <color name="poor_guess">#FF9800</color>        <!-- 1 Bull -->
+    <color name="wrong_guess">#F44336</color>       <!-- 0 Bulls -->
+</resources>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bulls &amp; Cows</string>
+    <string name="app_footer">© 2025 Bulls &amp; Cows</string>
+
+    <!-- Ana Menü -->
+    <string name="solo_mode">Tek Kişilik Mod</string>
+    <string name="basic_mode">Bilgisayara Karşı (Kolay)</string>
+    <string name="hard_mode">Bilgisayara Karşı (Zor)</string>
+    <string name="high_scores">Yüksek Skorlar</string>
+    <string name="info">Bilgi</string>
+    <string name="menu">Menü</string>
+
+    <!-- Skor ve Rekorlar -->
+    <string name="not_played_yet">Henüz oynanmadı</string>
+    <string name="win_in">Kazanma: %d tahmin</string>
+    <string name="guesses">tahmin</string>
+    <string name="record">Rekor: %d tahmin</string>
+    <string name="no_record">Henüz rekor yok</string>
+    <string name="attempts">Tahmin: %d</string>
+
+    <!-- Oyun Kontrolleri -->
+    <string name="new_game">Yeni Oyun</string>
+    <string name="new_game_confirm">Yeni oyun başlatmak istediğinizden emin misiniz?</string>
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
+    <string name="ok">Tamam</string>
+    <string name="back_to_menu">Menüye Dön</string>
+
+    <!-- Tahmin ve Feedback -->
+    <string name="enter_guess">Tahmininizi girin (4 rakam)</string>
+    <string name="submit">Gönder</string>
+    <string name="delete">Sil</string>
+    <string name="digit_already_used">Bu rakam zaten kullanıldı!</string>
+    <string name="invalid_guess">Geçersiz tahmin! 4 farklı rakam girmelisiniz.</string>
+    <string name="your_guesses">Tahminleriniz</string>
+
+    <!-- Bilgisayar Tahmin Modu -->
+    <string name="turn_player">Tur #%d - Sizin Sıranız</string>
+    <string name="turn_computer">Bilgisayarın Sırası</string>
+    <string name="computer_guess">Bilgisayarın Tahmini</string>
+    <string name="enter_feedback">Geri bildirim girin (örn: +2 -1)</string>
+    <string name="feedback_hint">+X -Y formatında</string>
+    <string name="feedback_buttons_help">Geri bildirim için butonları kullanın:</string>
+    <string name="invalid_feedback">Geçersiz geri bildirim! +X -Y formatında olmalıdır.</string>
+    <string name="inconsistent_feedback_title">Tutarsız Geri Bildirim</string>
+    <string name="inconsistent_feedback_message">Verdiğiniz geri bildirim önceki bildirimlerinizle tutarsız görünüyor. Lütfen tekrar kontrol edin.</string>
+
+    <!-- Oyun Sonuçları -->
+    <string name="congratulations">Tebrikler!</string>
+    <string name="correct_guess_message">%d denemede doğru tahmin ettiniz! Gizli sayı: %s</string>
+    <string name="you_win">Kazandınız!</string>
+    <string name="player_win_message">%d denemede kazandınız! Bilgisayarın tuttuğu sayı: %s</string>
+    <string name="computer_wins">Bilgisayar Kazandı</string>
+    <string name="computer_win_message">Bilgisayar %d denemede kazandı. Sizin tuttuğunuz sayı: %s</string>
+
+    <!-- Oyun Bilgileri -->
+    <string name="game_info_title">Oyun Bilgisi</string>
+    <string name="game_info_message">Bulls &amp; Cows, bir sayı tahmin oyunudur. Oyunun amacı, gizli 4 basamaklı sayıyı bulmaktır. Her tahminden sonra, doğru basamak ve doğru pozisyonda olan rakamlar (Bulls) ve doğru basamak ancak yanlış pozisyonda olan rakamlar (Cows) bildirilir.</string>
+    <string name="solo_game_info">Tek Kişilik Mod: Bilgisayarın tuttuğu 4 basamaklı sayıyı tahmin etmeye çalışın.</string>
+    <string name="basic_game_info">Kolay Mod: Hem siz hem de bilgisayar karşılıklı tahmin yapar. Bilgisayar basit bir algoritma kullanır.</string>
+    <string name="hard_game_info">Zor Mod: Hem siz hem de bilgisayar karşılıklı tahmin yapar. Bilgisayar gelişmiş bir algoritma kullanır.</string>
+
+    <!-- Numpad için string değerleri - strings.xml dosyasına ekleyin -->
+    <string name="button_0">0</string>
+    <string name="button_1">1</string>
+    <string name="button_2">2</string>
+    <string name="button_3">3</string>
+    <string name="button_4">4</string>
+    <string name="button_5">5</string>
+    <string name="button_6">6</string>
+    <string name="button_7">7</string>
+    <string name="button_8">8</string>
+    <string name="button_9">9</string>
+</resources>

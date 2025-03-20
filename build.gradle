@@ -1,0 +1,7 @@
+plugins {
+    id 'com.android.application' version '8.0.2' apply false
+    id 'com.android.library' version '8.0.2' apply false
+    // Kotlin plugin tamamen kaldırıldı
+}
+
+// Kotlin ile ilgili tüm konfigürasyonlar kaldırıldı
