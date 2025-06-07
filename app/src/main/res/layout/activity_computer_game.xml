@@ -25,8 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/menu"
             android:padding="8dp"
-            android:tint="@android:color/white"
-            android:src="@android:drawable/ic_menu_revert" />
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@android:color/white" />
 
         <TextView
             android:id="@+id/text_title"
@@ -46,8 +46,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/new_game"
             android:padding="8dp"
-            android:tint="@android:color/white"
-            android:src="@android:drawable/ic_menu_rotate" />
+            android:src="@android:drawable/ic_menu_rotate"
+            app:tint="@android:color/white" />
 
         <ImageButton
             android:id="@+id/btn_info"
@@ -56,8 +56,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/info"
             android:padding="8dp"
-            android:tint="@android:color/white"
-            android:src="@android:drawable/ic_dialog_info" />
+            android:src="@android:drawable/ic_dialog_info"
+            app:tint="@android:color/white" />
 
         <ImageButton
             android:id="@+id/btn_surrender"
@@ -66,8 +66,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/surrender"
             android:padding="8dp"
-            android:tint="@android:color/white"
-            android:src="@drawable/ic_surrender" />
+            android:src="@drawable/ic_surrender"
+            app:tint="@android:color/white" />
     </LinearLayout>
 
     <!-- Durum Bilgisi -->

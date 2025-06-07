@@ -18,6 +18,20 @@ public class Constants {
     public static final String PREF_HIGH_SCORE_SOLO = "high_score_solo";
     public static final String PREF_HIGH_SCORE_BASIC = "high_score_basic";
     public static final String PREF_HIGH_SCORE_HARD = "high_score_hard";
+    // Devam eden oyun bilgileri
+    public static final String PREF_SOLO_SECRET = "solo_secret";
+    public static final String PREF_SOLO_ATTEMPTS = "solo_attempts";
+    public static final String PREF_SOLO_GUESSES = "solo_guesses";
+    public static final String PREF_SOLO_IN_PROGRESS = "solo_in_progress";
+
+    public static final String PREF_COMP_PLAYER_SECRET = "comp_player_secret";
+    public static final String PREF_COMP_COMPUTER_SECRET = "comp_computer_secret";
+    public static final String PREF_COMP_PLAYER_GUESSES = "comp_player_guesses";
+    public static final String PREF_COMP_RESULTS = "comp_results";
+    public static final String PREF_COMP_CURRENT_GUESS = "comp_current_guess";
+    public static final String PREF_COMP_STATE = "comp_state";
+    public static final String PREF_COMP_TURN = "comp_turn";
+    public static final String PREF_COMP_SURRENDERED = "comp_surrendered";
 
     // Animasyon süreleri (ms)
     public static final int ANIMATION_SHORT = 300;

@@ -2,6 +2,10 @@ package com.example.bullscows.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import org.json.JSONArray;
+import org.json.JSONException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Oyun ayarlarını ve rekorları SharedPreferences üzerinden yöneten sınıf
@@ -147,5 +151,46 @@ public class GamePreferences {
      */
     public boolean getBoolean(String key, boolean defaultValue) {
         return preferences.getBoolean(key, defaultValue);
+    }
+    /**
+     * String listesi kaydeder
+     * @param key Anahtar
+     * @param values Liste
+     */
+    public void saveStringList(String key, List<String> values) {
+        JSONArray array = new JSONArray();
+        for (String val : values) {
+            array.put(val);
+        }
+        editor.putString(key, array.toString());
+        editor.apply();
+    }
+
+    /**
+     * String listesi alır
+     * @param key Anahtar
+     * @return Liste (yoksa boş)
+     */
+    public List<String> getStringList(String key) {
+        List<String> list = new ArrayList<>();
+        String json = preferences.getString(key, null);
+        if (json != null) {
+            try {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    list.add(array.getString(i));
+                }
+            } catch (JSONException ignored) {}
+        }
+        return list;
+    }
+
+    /**
+     * Bir anahtarı siler
+     * @param key Anahtar
+     */
+    public void remove(String key) {
+        editor.remove(key);
+        editor.apply();
     }
 }

@@ -77,5 +77,6 @@
     <string name="surrender_title">Pes Et</string>
     <string name="surrender_message">Pes ettiniz. Bilgisayarın tuttuğu sayı: %s</string>
     <string name="surrender">Pes Et</string>
+    <string name="surrender_confirm">Pes etmek istediğinizden emin misiniz?</string>
     <string name="back_to_menu">Menüye Dön</string>
 </resources>

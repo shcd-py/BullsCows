@@ -26,7 +26,9 @@ import com.example.bullscows.engine.NumberGenerator;
 import com.example.bullscows.model.GuessResult;
 import com.example.bullscows.util.Constants;
 import com.example.bullscows.util.GamePreferences;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -67,7 +69,7 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private EditText feedbackInput;
     private ImageButton feedbackDeleteButton;
     private ImageButton feedbackSubmitButton;
-    private Button[] digitsButtons = new Button[4]; // 1, 2, 3, 4 butonları
+    private Button[] digitsButtons = new Button[5]; // 0, 1, 2, 3, 4 butonları
     private Button plusButton;
     private Button minusButton;
     private View feedbackControls; // Feedback kontrolleri konteyner
@@ -84,6 +86,9 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private int currentGameState; // Mevcut oyun durumu
     private int turn; // Tur sayısı
     private GamePreferences gamePreferences;
+
+    private boolean gameFinished;
+    private boolean surrendered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,35 +115,13 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         // Oyun verilerini başlat
         initializeGameData();
 
-        // Yeni oyunu başlat
-        startNewGame();
-
-        // Pes Et butonunu ekle
-        addSurrenderButton();
-    }
-
-    /**
-     * Pes Et butonunu toolbar'a ekler
-     */
-    private void addSurrenderButton() {
-        // Surrender butonunu toolbar'a ekle
-        btnSurrender = new ImageButton(this);
-        btnSurrender.setId(View.generateViewId()); // Dinamik ID oluştur
-        btnSurrender.setImageResource(R.drawable.ic_surrender);
-        btnSurrender.setBackgroundResource(android.R.color.transparent);
-        btnSurrender.setContentDescription(getString(R.string.surrender));
-        btnSurrender.setPadding(8, 8, 8, 8);
-
-        // Toolbar'a ekle
-        View toolbar = findViewById(R.id.top_toolbar);
-        if (toolbar instanceof android.widget.LinearLayout) {
-            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
-                    48, 48);
-            ((android.widget.LinearLayout) toolbar).addView(btnSurrender, params);
-
-            // Tıklama olayı ekle
-            btnSurrender.setOnClickListener(v -> showSurrenderDialog());
+        // Oyun durumu varsa yükle, yoksa yeni oyun başlat
+        gameFinished = false;
+        surrendered = false;
+        if (!restoreGame()) {
+            startNewGame();
         }
+
     }
 
     /**
@@ -165,7 +148,8 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         btnMenu = findViewById(R.id.btn_menu);
         btnNewGame = findViewById(R.id.btn_new_game);
         btnInfo = findViewById(R.id.btn_info);
-
+        btnSurrender = findViewById(R.id.btn_surrender);
+        btnSurrender.setOnClickListener(v -> showSurrenderDialog());
         // Başlığı ayarla
         titleText.setText(Constants.MODE_HARD.equals(gameMode) ? R.string.hard_mode : R.string.basic_mode);
 
@@ -196,10 +180,10 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         feedbackDeleteButton = findViewById(R.id.feedback_btn_delete);
         feedbackSubmitButton = findViewById(R.id.feedback_btn_submit);
 
-        // Feedback butonları - 1, 2, 3, 4 butonları
-        for (int i = 1; i <= 4; i++) {
+        // Feedback butonları - 0, 1, 2, 3, 4 butonları
+        for (int i = 0; i <= 4; i++) {
             int id = getResources().getIdentifier("btn_digit_" + i, "id", getPackageName());
-            digitsButtons[i-1] = findViewById(id);
+            digitsButtons[i] = findViewById(id);
         }
         plusButton = findViewById(R.id.btn_plus);
         minusButton = findViewById(R.id.btn_minus);
@@ -263,9 +247,17 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
      * Yeni oyun başlatır
      */
     private void startNewGame() {
+        clearSavedGame();
+        gameFinished = false;
+        surrendered = false;
         // Bilgisayarın ve kullanıcının tuttuğu sayıları oluştur
         computerSecret = gameEngine.generateSecretNumber();
         playerSecret = gameEngine.generateSecretNumber(); // Otomatik olarak kullanıcı için de bir sayı tut
+
+        // Bilgisayar AI'ını sıfırla
+        if (computerAI != null) {
+            computerAI.reset();
+        }
 
         // Verileri temizle
         playerGuesses.clear();
@@ -331,14 +323,34 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     }
 
     /**
+     * Pes etme işlemi için onay diyaloğunu gösterir
+     */
+    private void showSurrenderConfirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.surrender_title)
+                .setMessage(R.string.surrender_confirm)
+                .setPositiveButton(R.string.yes, (dialog, which) -> showSurrenderDialog())
+                .setNegativeButton(R.string.no, null)
+                .show();
+    }
+
+    /**
      * Teslim olma diyaloğunu gösterir
      */
     private void showSurrenderDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.surrender_title)
                 .setMessage(getString(R.string.surrender_message, computerSecret))
-                .setPositiveButton(R.string.new_game, (dialog, which) -> startNewGame())
-                .setNegativeButton(R.string.back_to_menu, (dialog, which) -> finish())
+                .setPositiveButton(R.string.new_game, (dialog, which) -> {
+                    surrendered = true;
+                    clearSavedGame();
+                    startNewGame();
+                })
+                .setNegativeButton(R.string.back_to_menu, (dialog, which) -> {
+                    surrendered = true;
+                    clearSavedGame();
+                    finish();
+                })
                 .setCancelable(false)
                 .show();
     }
@@ -419,11 +431,11 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         else if (v.getId() == minusButton.getId()) {
             feedbackInput.setText(currentFeedback + "-");
         }
-        // Rakam butonları (1-4)
+        // Rakam butonları (0-4)
         else {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i <= 4; i++) {
                 if (v.getId() == digitsButtons[i].getId()) {
-                    feedbackInput.setText(currentFeedback + (i + 1));
+                    feedbackInput.setText(currentFeedback + (i));
                     break;
                 }
             }
@@ -644,6 +656,8 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
      * Kullanıcı kazandığında çağrılır
      */
     private void handlePlayerWin() {
+        gameFinished = true;
+        clearSavedGame();
         // Rekoru güncelle
         int recordTurns = gamePreferences.getHighScore(gameMode);
         if (recordTurns == 0 || turn < recordTurns) {
@@ -664,6 +678,8 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
      * Bilgisayar kazandığında çağrılır
      */
     private void handleComputerWin() {
+        gameFinished = true;
+        clearSavedGame();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.computer_wins)
                 .setMessage(getString(R.string.computer_win_message, turn, playerSecret))
@@ -671,6 +687,112 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
                 .setNegativeButton(R.string.back_to_menu, (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
+    }
+
+    /**
+     * Kaydedilmiş oyunu yükler
+     *
+     * @return yüklendiyse true
+     */
+    private boolean restoreGame() {
+        playerSecret = gamePreferences.getString(Constants.PREF_COMP_PLAYER_SECRET, null);
+        computerSecret = gamePreferences.getString(Constants.PREF_COMP_COMPUTER_SECRET, null);
+        if (playerSecret == null || computerSecret == null) {
+            return false;
+        }
+
+        turn = gamePreferences.getInt(Constants.PREF_COMP_TURN, 1);
+        currentGameState = gamePreferences.getInt(Constants.PREF_COMP_STATE, STATE_PLAYER_GUESS);
+        currentComputerGuess = gamePreferences.getString(Constants.PREF_COMP_CURRENT_GUESS, null);
+
+        playerGuesses.clear();
+        computerGuessResults.clear();
+
+        String playerJson = gamePreferences.getString(Constants.PREF_COMP_PLAYER_GUESSES, null);
+        if (playerJson != null) {
+            try {
+                JSONArray arr = new JSONArray(playerJson);
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    int attempt = obj.getInt("attempt");
+                    String guess = obj.getString("guess");
+                    int bulls = obj.getInt("bulls");
+                    int cows = obj.getInt("cows");
+                    playerGuesses.add(new GuessItem(attempt, guess, new GuessResult(bulls, cows)));
+                }
+            } catch (JSONException ignored) {
+            }
+        }
+
+        String compJson = gamePreferences.getString(Constants.PREF_COMP_RESULTS, null);
+        if (compJson != null) {
+            try {
+                JSONArray arr = new JSONArray(compJson);
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    int bulls = obj.getInt("bulls");
+                    int cows = obj.getInt("cows");
+                    computerGuessResults.add(new GuessResult(bulls, cows));
+                }
+            } catch (JSONException ignored) {
+            }
+        }
+
+        guessAdapter.notifyDataSetChanged();
+        setGameState(currentGameState);
+        if (currentGameState == STATE_COMPUTER_GUESS && currentComputerGuess != null) {
+            computerGuessText.setText(currentComputerGuess);
+        }
+        return true;
+    }
+
+    /**
+     * Oyun durumunu kaydeder
+     */
+    private void saveGame() {
+        JSONArray playerArr = new JSONArray();
+        JSONArray compArr = new JSONArray();
+        try {
+            for (GuessItem item : playerGuesses) {
+                JSONObject obj = new JSONObject();
+                obj.put("attempt", item.getAttemptNumber());
+                obj.put("guess", item.getGuess());
+                obj.put("bulls", item.getResult().getBulls());
+                obj.put("cows", item.getResult().getCows());
+                playerArr.put(obj);
+            }
+            for (GuessResult res : computerGuessResults) {
+                JSONObject obj = new JSONObject();
+                obj.put("bulls", res.getBulls());
+                obj.put("cows", res.getCows());
+                compArr.put(obj);
+            }
+        } catch (JSONException ignored) {
+        }
+
+        gamePreferences.saveString(Constants.PREF_COMP_PLAYER_SECRET, playerSecret);
+        gamePreferences.saveString(Constants.PREF_COMP_COMPUTER_SECRET, computerSecret);
+        gamePreferences.saveInt(Constants.PREF_COMP_TURN, turn);
+        gamePreferences.saveInt(Constants.PREF_COMP_STATE, currentGameState);
+        if (currentComputerGuess != null) {
+            gamePreferences.saveString(Constants.PREF_COMP_CURRENT_GUESS, currentComputerGuess);
+        }
+        gamePreferences.saveString(Constants.PREF_COMP_PLAYER_GUESSES, playerArr.toString());
+        gamePreferences.saveString(Constants.PREF_COMP_RESULTS, compArr.toString());
+    }
+
+    /**
+     * Kaydedilmiş oyunu temizler
+     */
+    private void clearSavedGame() {
+        gamePreferences.remove(Constants.PREF_COMP_PLAYER_SECRET);
+        gamePreferences.remove(Constants.PREF_COMP_COMPUTER_SECRET);
+        gamePreferences.remove(Constants.PREF_COMP_TURN);
+        gamePreferences.remove(Constants.PREF_COMP_STATE);
+        gamePreferences.remove(Constants.PREF_COMP_CURRENT_GUESS);
+        gamePreferences.remove(Constants.PREF_COMP_PLAYER_GUESSES);
+        gamePreferences.remove(Constants.PREF_COMP_RESULTS);
+        gamePreferences.remove(Constants.PREF_COMP_SURRENDERED);
     }
 
     /**
@@ -701,6 +823,14 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
 
         public String getFormattedGuess() {
             return "Tahmin #" + attemptNumber + ": " + guess;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!gameFinished && !surrendered) {
+            saveGame();
         }
     }
 }

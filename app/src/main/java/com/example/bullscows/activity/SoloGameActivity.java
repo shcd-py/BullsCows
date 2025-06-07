@@ -23,6 +23,10 @@ import com.example.bullscows.model.GuessResult;
 import com.example.bullscows.util.Constants;
 import com.example.bullscows.util.GamePreferences;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +61,8 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
     private int recordAttempts;
     private GamePreferences gamePreferences;
 
+    private boolean gameFinished;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +79,12 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
         // RecyclerView ayarla
         setupRecyclerView();
 
-        // Oyunu başlat
-        startNewGame();
+
+        // Oyun durumu varsa yükle, yoksa yeni oyun başlat
+        gameFinished = false;
+        if (!restoreGame()) {
+            startNewGame();
+        }
     }
 
     /**
@@ -134,6 +144,8 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
      * Yeni oyun başlatır
      */
     private void startNewGame() {
+        clearSavedGame();
+        gameFinished = false;
         // Yeni gizli sayı oluştur
         secretNumber = gameEngine.generateSecretNumber();
 
@@ -193,6 +205,75 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
             recordText.setText(R.string.no_record);
         }
     }
+    /**
+     * Kaydedilmiş oyunu yükler
+     * @return yüklendiyse true
+     */
+    private boolean restoreGame() {
+        if (!gamePreferences.getBoolean(Constants.PREF_SOLO_IN_PROGRESS, false)) {
+            return false;
+        }
+
+        secretNumber = gamePreferences.getString(Constants.PREF_SOLO_SECRET, null);
+        if (secretNumber == null) {
+            return false;
+        }
+
+        attempts = gamePreferences.getInt(Constants.PREF_SOLO_ATTEMPTS, 0);
+        guesses.clear();
+        String json = gamePreferences.getString(Constants.PREF_SOLO_GUESSES, null);
+        if (json != null) {
+            try {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = array.getJSONObject(i);
+                    int attempt = obj.getInt("attempt");
+                    String guess = obj.getString("guess");
+                    int bulls = obj.getInt("bulls");
+                    int cows = obj.getInt("cows");
+                    guesses.add(new GuessItem(attempt, guess, new GuessResult(bulls, cows)));
+                }
+            } catch (JSONException ignored) {}
+        }
+        guessAdapter.notifyDataSetChanged();
+        updateAttemptsText();
+        recordAttempts = gamePreferences.getHighScore(Constants.MODE_SOLO);
+        updateRecordText();
+        return true;
+    }
+
+    /**
+     * Oyun durumunu kaydeder
+     */
+    private void saveGame() {
+        JSONArray array = new JSONArray();
+        try {
+            for (GuessItem item : guesses) {
+                JSONObject obj = new JSONObject();
+                obj.put("attempt", item.getAttemptNumber());
+                obj.put("guess", item.getGuess());
+                obj.put("bulls", item.getResult().getBulls());
+                obj.put("cows", item.getResult().getCows());
+                array.put(obj);
+            }
+        } catch (JSONException ignored) {}
+
+        gamePreferences.saveString(Constants.PREF_SOLO_SECRET, secretNumber);
+        gamePreferences.saveInt(Constants.PREF_SOLO_ATTEMPTS, attempts);
+        gamePreferences.saveString(Constants.PREF_SOLO_GUESSES, array.toString());
+        gamePreferences.saveBoolean(Constants.PREF_SOLO_IN_PROGRESS, true);
+    }
+
+    /**
+     * Kaydedilmiş oyunu temizler
+     */
+    private void clearSavedGame() {
+        gamePreferences.remove(Constants.PREF_SOLO_SECRET);
+        gamePreferences.remove(Constants.PREF_SOLO_ATTEMPTS);
+        gamePreferences.remove(Constants.PREF_SOLO_GUESSES);
+        gamePreferences.remove(Constants.PREF_SOLO_IN_PROGRESS);
+    }
+
 
     /**
      * Numpad butonlarına tıklama olayı
@@ -271,6 +352,8 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
      * Doğru tahmin sonrası işlemler
      */
     private void handleCorrectGuess() {
+        gameFinished = true;
+        clearSavedGame();
         // Rekoru güncelle
         if (recordAttempts == 0 || attempts < recordAttempts) {
             recordAttempts = attempts;
@@ -316,6 +399,13 @@ public class SoloGameActivity extends AppCompatActivity implements View.OnClickL
 
         public String getFormattedGuess() {
             return "Tahmin #" + attemptNumber + ": " + guess;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!gameFinished) {
+            saveGame();
         }
     }
 }
