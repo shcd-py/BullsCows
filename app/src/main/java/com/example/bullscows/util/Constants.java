@@ -39,18 +39,18 @@ public class Constants {
 
     // Hata mesajları
     public static final String ERROR_INVALID_GUESS = "Geçersiz tahmin! 4 farklı rakam içermelidir.";
-    public static final String ERROR_INVALID_FEEDBACK = "Geçersiz geri bildirim! +X -Y formatında olmalıdır.";
+    public static final String ERROR_INVALID_FEEDBACK = "Geçersiz geri bildirim! Kabul edilen formatlar: +X -Y, -X +Y, +X, -Y, X,Y veya X";
     public static final String ERROR_INCONSISTENT_FEEDBACK = "Tutarsız geri bildirim! Önceki geribildirimlerle uyuşmuyor.";
 
     // Diğer mesajlar
     public static final String MESSAGE_PLAYER_WIN = "Tebrikler! %d denemede kazandınız.";
     public static final String MESSAGE_COMPUTER_WIN = "Bilgisayar %d denemede kazandı.";
+    public static final String MESSAGE_SURRENDER = "Pes ettiniz. Bilgisayarın tuttuğu sayı: %s";
 
-    // Gizli ayarlar (debug mode)
-    public static final boolean DEBUG_MODE = false; // Debug modu açık/kapalı
-    public static final boolean SHOW_SECRET_NUMBER = false; // Gizli sayıyı göster (sadece debug modunda)
-
-    private Constants() {
-        // Private constructor to prevent instantiation
-    }
+    // Diyalog başlıkları
+    public static final String TITLE_SURRENDER = "Pes Et";
+    public static final String TITLE_PLAYER_WIN = "Tebrikler!";
+    public static final String TITLE_COMPUTER_WIN = "Bilgisayar Kazandı";
+    public static final String TITLE_NEW_GAME = "Yeni Oyun";
+    public static final String TITLE_GAME_INFO = "Oyun Bilgisi";
 }

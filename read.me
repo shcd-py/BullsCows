@@ -1,0 +1,106 @@
+# Bulls and Cows (Boğa ve İnek) Oyunu
+
+Bu Android uygulaması, klasik sayı tahmin oyunu olan "Bulls and Cows" (Boğa ve İnek) oyununun bir implementasyonudur. Oyuncular 4 basamaklı, tüm rakamları farklı bir sayı tahmin etmeye çalışırlar.
+
+## Oyun Özellikleri
+
+- **Tek Kişilik Mod**: Bilgisayarın rastgele tuttuğu sayıyı tahmin etmeye çalışın.
+- **Bilgisayara Karşı Mod (Kolay)**: Sırayla bilgisayarla karşılıklı sayı tahmin etmeye çalışın. Bilgisayar basit bir strateji kullanır.
+- **Bilgisayara Karşı Mod (Zor)**: Daha gelişmiş bir AI algoritması kullanan bilgisayara karşı oynayın.
+- **Yüksek Skorlar**: Her oyun modu için en iyi skorlarınızı kaydeder.
+
+## Oyun Kuralları
+
+1. Oyuncu 4 basamaklı, her basamağında farklı rakamlar olan bir sayı tahmin eder.
+2. Tahmin sonucunda iki değer döner:
+   - **Bulls (Boğalar)**: Doğru rakam, doğru pozisyon sayısı.
+   - **Cows (İnekler)**: Doğru rakam, yanlış pozisyon sayısı.
+3. Örnek: Gizli sayı "1234" ise ve oyuncu "1432" tahmininde bulunursa, sonuç: 2 Bulls (1 ve 4 doğru pozisyondadır) ve 2 Cows (2 ve 3 yanlış pozisyondadır) olacaktır.
+4. Tahminler 4 Bulls olana kadar (yani sayı tam olarak bilinene kadar) devam eder.
+
+## Proje Yapısı ve Dosyalar
+
+### Activity Sınıfları
+
+- **MainActivity.java**: Ana menü, oyun modlarını seçme ekranı.
+- **SoloGameActivity.java**: Tek kişilik oyun ekranı.
+- **ComputerGameActivity.java**: Bilgisayara karşı oyun ekranı.
+
+### Adapter Sınıfları
+
+- **GuessAdapter.java**: Tahmin geçmişini RecyclerView'da göstermek için.
+- **ScoreAdapter.java**: Yüksek skorları RecyclerView'da göstermek için.
+
+### AI Paketi
+
+- **ComputerAI.java**: Bilgisayar AI'ı için arayüz.
+- **BasicComputerAI.java**: Basit tahmin stratejisi (Kolay mod).
+- **AdvancedComputerAI.java**: Knuth algoritmasına dayalı gelişmiş strateji (Zor mod).
+
+### Database Paketi
+
+- **Score.java**: Skor verilerini temsil eden entity sınıfı.
+- **ScoreDao.java**: Veritabanı erişim metodlarını içeren DAO (Data Access Object).
+- **ScoreDatabase.java**: Room veritabanı tanımı.
+
+### Engine Paketi
+
+- **GameEngine.java**: Oyun mantığını yöneten ana sınıf.
+- **GuessChecker.java**: Tahmin sonuçlarını hesaplayan sınıf.
+- **NumberGenerator.java**: Rastgele sayı üreten sınıf.
+
+### Model Paketi
+
+- **GameState.java**: Oyun durumunu temsil eden sınıf.
+- **GuessResult.java**: Tahmin sonuçlarını tutan sınıf.
+
+### Util Paketi
+
+- **Constants.java**: Uygulama genelinde kullanılan sabit değerler.
+- **GamePreferences.java**: Oyun ayarlarını ve rekorları yöneten sınıf.
+
+## Uygulama Mimarisi
+
+Bu uygulama MVC (Model-View-Controller) desenine benzer bir mimari kullanır:
+
+- **Model**: `model`, `engine`, `database` paketlerindeki sınıflar veri modelini ve iş mantığını içerir.
+- **View**: Layout XML dosyaları ve adapter sınıfları kullanıcı arayüzünü yönetir.
+- **Controller**: Activity sınıfları kullanıcı etkileşimlerini işler ve model ile görünüm arasında köprü görevi görür.
+
+## Algoritma Açıklamaları
+
+### Tahmin Kontrolü (GuessChecker)
+
+Tahmin kontrolü, gizli sayı ve tahmin arasındaki boğa (Bulls) ve inek (Cows) sayısını hesaplar:
+
+1. Önce aynı pozisyondaki aynı rakamlar (Bulls) bulunur.
+2. Ardından doğru rakam ama yanlış pozisyonlar (Cows) hesaplanır.
+
+### Gelişmiş Bilgisayar AI (AdvancedComputerAI)
+
+Zor modda kullanılan gelişmiş AI, Knuth'un "Bulls and Cows" için Minimax stratejisini uygular:
+
+1. Olası tüm sayıları içeren bir liste oluşturulur.
+2. Kullanıcının verdiği feedback'e göre olası sayılar filtrelenir.
+3. Kalan olası sayılar arasında, en kötü durumda bile en çok sayıda olasılığı elemesi beklenen tahmin seçilir.
+
+## Kullanım
+
+1. Uygulamayı başlatın ve ana menüden oyun modunu seçin.
+2. Tahminlerinizi numpad kullanarak girin.
+3. Bilgisayara karşı oynarken, bilgisayarın tahminlerine doğru geri bildirim vermeyi unutmayın.
+4. Sonuçları takip edin ve en iyi skorlarınızı geliştirmeye çalışın!
+
+## Geliştirme
+
+Bu projeyi klonlayarak kendi Bulls and Cows uygulamanızı geliştirebilirsiniz. Aşağıdaki özellikleri ekleyerek projeyi genişletebilirsiniz:
+
+- Çok oyunculu mod
+- Daha gelişmiş UI tasarımı
+- Ses efektleri ve animasyonlar
+- Farklı oyun zorluk seviyeleri
+- Zaman sınırlı modlar
+
+## Lisans
+
+Bu proje açık kaynaklıdır ve MIT Lisansı altında dağıtılmaktadır.

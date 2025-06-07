@@ -58,6 +58,16 @@
             android:padding="8dp"
             android:tint="@android:color/white"
             android:src="@android:drawable/ic_dialog_info" />
+
+        <ImageButton
+            android:id="@+id/btn_surrender"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/surrender"
+            android:padding="8dp"
+            android:tint="@android:color/white"
+            android:src="@drawable/ic_surrender" />
     </LinearLayout>
 
     <!-- Durum Bilgisi -->
@@ -441,6 +451,7 @@
             android:text="@string/feedback_buttons_help"
             android:textSize="14sp" />
 
+        <!-- İlk satır: +, 1, -, 2 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -470,17 +481,6 @@
                 android:text="1" />
 
             <Button
-                android:id="@+id/btn_space"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_margin="2dp"
-                android:background="@drawable/button_feedback"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:text=" " />
-
-            <Button
                 android:id="@+id/btn_minus"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
@@ -503,6 +503,7 @@
                 android:text="2" />
         </LinearLayout>
 
+        <!-- İkinci satır: 3, 4, 0 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -541,6 +542,11 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:text="0" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
 

@@ -25,7 +25,6 @@
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
     <string name="ok">Tamam</string>
-    <string name="back_to_menu">Menüye Dön</string>
 
     <!-- Tahmin ve Feedback -->
     <string name="enter_guess">Tahmininizi girin (4 rakam)</string>
@@ -39,20 +38,21 @@
     <string name="turn_player">Tur #%d - Sizin Sıranız</string>
     <string name="turn_computer">Bilgisayarın Sırası</string>
     <string name="computer_guess">Bilgisayarın Tahmini</string>
-    <string name="enter_feedback">Geri bildirim girin (örn: +2 -1)</string>
-    <string name="feedback_hint">+X -Y formatında</string>
-    <string name="feedback_buttons_help">Geri bildirim için butonları kullanın:</string>
-    <string name="invalid_feedback">Geçersiz geri bildirim! +X -Y formatında olmalıdır.</string>
+    <string name="enter_feedback">Geri Bildirim Girin</string>
+    <string name="feedback_hint">Örn: +1 -2</string>
+    <string name="feedback_format_hint">+X -Y veya X,Y biçiminde</string>
+    <string name="feedback_buttons_help">Butonları kullanarak geri bildirim verin</string>
     <string name="inconsistent_feedback_title">Tutarsız Geri Bildirim</string>
-    <string name="inconsistent_feedback_message">Verdiğiniz geri bildirim önceki bildirimlerinizle tutarsız görünüyor. Lütfen tekrar kontrol edin.</string>
+    <string name="inconsistent_feedback_message">Verdiğiniz geri bildirim önceki geribildirimlerle tutarlı değil.</string>
+    <string name="invalid_feedback">Geçersiz geri bildirim! Kabul edilen formatlar: +X -Y, -X +Y, +X, -Y, X,Y veya X</string>
 
     <!-- Oyun Sonuçları -->
     <string name="congratulations">Tebrikler!</string>
     <string name="correct_guess_message">%d denemede doğru tahmin ettiniz! Gizli sayı: %s</string>
     <string name="you_win">Kazandınız!</string>
-    <string name="player_win_message">%d denemede kazandınız! Bilgisayarın tuttuğu sayı: %s</string>
+    <string name="player_win_message">%d denemede doğru tahmin ettiniz! Bilgisayarın tuttuğu sayı: %s</string>
     <string name="computer_wins">Bilgisayar Kazandı</string>
-    <string name="computer_win_message">Bilgisayar %d denemede kazandı. Sizin tuttuğunuz sayı: %s</string>
+    <string name="computer_win_message">Bilgisayar %d denemede tahmini buldu! Tuttuğunuz sayı: %s</string>
 
     <!-- Oyun Bilgileri -->
     <string name="game_info_title">Oyun Bilgisi</string>
@@ -61,7 +61,7 @@
     <string name="basic_game_info">Kolay Mod: Hem siz hem de bilgisayar karşılıklı tahmin yapar. Bilgisayar basit bir algoritma kullanır.</string>
     <string name="hard_game_info">Zor Mod: Hem siz hem de bilgisayar karşılıklı tahmin yapar. Bilgisayar gelişmiş bir algoritma kullanır.</string>
 
-    <!-- Numpad için string değerleri - strings.xml dosyasına ekleyin -->
+    <!-- Numpad için string değerleri -->
     <string name="button_0">0</string>
     <string name="button_1">1</string>
     <string name="button_2">2</string>
@@ -72,4 +72,10 @@
     <string name="button_7">7</string>
     <string name="button_8">8</string>
     <string name="button_9">9</string>
+
+    <!-- Pes etme/teslim olma -->
+    <string name="surrender_title">Pes Et</string>
+    <string name="surrender_message">Pes ettiniz. Bilgisayarın tuttuğu sayı: %s</string>
+    <string name="surrender">Pes Et</string>
+    <string name="back_to_menu">Menüye Dön</string>
 </resources>

@@ -29,6 +29,8 @@ import com.example.bullscows.util.GamePreferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Bilgisayara karşı oyun modu aktivitesi
@@ -46,6 +48,7 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private ImageButton btnMenu;
     private ImageButton btnNewGame;
     private ImageButton btnInfo;
+    private ImageButton btnSurrender; // Teslim olma butonu
 
     // UI bileşenleri - Kullanıcı Tahmin
     private CardView playerGuessCard;
@@ -55,6 +58,8 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private ImageButton playerDeleteButton;
     private ImageButton playerSubmitButton;
     private Button[] playerNumberButtons = new Button[10];
+    private View inputCard; // Tahmin giriş kartı
+    private View playerNumpad; // Numpad konteyner
 
     // UI bileşenleri - Bilgisayar Tahmin
     private CardView computerGuessCard;
@@ -62,9 +67,10 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private EditText feedbackInput;
     private ImageButton feedbackDeleteButton;
     private ImageButton feedbackSubmitButton;
-    private Button[] digitsButtons = new Button[5]; // 1, 2, 3, 4 ve boşluk butonu
+    private Button[] digitsButtons = new Button[4]; // 1, 2, 3, 4 butonları
     private Button plusButton;
     private Button minusButton;
+    private View feedbackControls; // Feedback kontrolleri konteyner
 
     // Oyun değişkenleri
     private String gameMode;
@@ -106,6 +112,33 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
 
         // Yeni oyunu başlat
         startNewGame();
+
+        // Pes Et butonunu ekle
+        addSurrenderButton();
+    }
+
+    /**
+     * Pes Et butonunu toolbar'a ekler
+     */
+    private void addSurrenderButton() {
+        // Surrender butonunu toolbar'a ekle
+        btnSurrender = new ImageButton(this);
+        btnSurrender.setId(View.generateViewId()); // Dinamik ID oluştur
+        btnSurrender.setImageResource(R.drawable.ic_surrender);
+        btnSurrender.setBackgroundResource(android.R.color.transparent);
+        btnSurrender.setContentDescription(getString(R.string.surrender));
+        btnSurrender.setPadding(8, 8, 8, 8);
+
+        // Toolbar'a ekle
+        View toolbar = findViewById(R.id.top_toolbar);
+        if (toolbar instanceof android.widget.LinearLayout) {
+            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                    48, 48);
+            ((android.widget.LinearLayout) toolbar).addView(btnSurrender, params);
+
+            // Tıklama olayı ekle
+            btnSurrender.setOnClickListener(v -> showSurrenderDialog());
+        }
     }
 
     /**
@@ -143,6 +176,8 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         playerGuessInput.setFocusable(false); // Manuel giriş yerine numpad kullanılacak
         playerDeleteButton = findViewById(R.id.player_btn_delete);
         playerSubmitButton = findViewById(R.id.player_btn_submit);
+        inputCard = findViewById(R.id.input_card);
+        playerNumpad = findViewById(R.id.player_numpad);
 
         // Kullanıcı numpad butonları
         for (int i = 0; i < 10; i++) {
@@ -155,15 +190,17 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         computerGuessText = findViewById(R.id.text_computer_guess);
         feedbackInput = findViewById(R.id.feedback_input);
         feedbackInput.setFocusable(false); // Manuel giriş yerine butonlar kullanılacak
+
+        // Feedback kontrolleri
+        feedbackControls = findViewById(R.id.feedback_controls);
         feedbackDeleteButton = findViewById(R.id.feedback_btn_delete);
         feedbackSubmitButton = findViewById(R.id.feedback_btn_submit);
 
-        // Feedback butonları
+        // Feedback butonları - 1, 2, 3, 4 butonları
         for (int i = 1; i <= 4; i++) {
             int id = getResources().getIdentifier("btn_digit_" + i, "id", getPackageName());
             digitsButtons[i-1] = findViewById(id);
         }
-        digitsButtons[4] = findViewById(R.id.btn_space);
         plusButton = findViewById(R.id.btn_plus);
         minusButton = findViewById(R.id.btn_minus);
 
@@ -209,8 +246,6 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         }
         plusButton.setOnClickListener(this);
         minusButton.setOnClickListener(this);
-
-        findViewById(R.id.feedback_controls).setVisibility(View.VISIBLE);
     }
 
     /**
@@ -255,14 +290,27 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         if (state == STATE_PLAYER_GUESS) {
             // Kullanıcı tahmin aşaması
             turnInfoText.setText(getString(R.string.turn_player, turn));
+
+            // Kullanıcı arayüzü göster
             playerGuessCard.setVisibility(View.VISIBLE);
+            inputCard.setVisibility(View.VISIBLE);
+            playerNumpad.setVisibility(View.VISIBLE);
+
+            // Bilgisayar arayüzünü gizle
             computerGuessCard.setVisibility(View.GONE);
+            feedbackControls.setVisibility(View.GONE);
         } else {
             // Bilgisayar tahmin aşaması
             turnInfoText.setText(R.string.turn_computer);
+
+            // Kullanıcı arayüzünü gizle
             playerGuessCard.setVisibility(View.GONE);
+            inputCard.setVisibility(View.GONE);
+            playerNumpad.setVisibility(View.GONE);
+
+            // Bilgisayar arayüzünü göster
             computerGuessCard.setVisibility(View.VISIBLE);
-            findViewById(R.id.feedback_controls).setVisibility(View.VISIBLE);
+            feedbackControls.setVisibility(View.VISIBLE);
 
             // Bilgisayarın tahminini al
             currentComputerGuess = gameEngine.getComputerGuess(computerGuessResults);
@@ -279,6 +327,19 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
                 .setMessage(R.string.new_game_confirm)
                 .setPositiveButton(R.string.yes, (dialog, which) -> startNewGame())
                 .setNegativeButton(R.string.no, null)
+                .show();
+    }
+
+    /**
+     * Teslim olma diyaloğunu gösterir
+     */
+    private void showSurrenderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.surrender_title)
+                .setMessage(getString(R.string.surrender_message, computerSecret))
+                .setPositiveButton(R.string.new_game, (dialog, which) -> startNewGame())
+                .setNegativeButton(R.string.back_to_menu, (dialog, which) -> finish())
+                .setCancelable(false)
                 .show();
     }
 
@@ -358,10 +419,6 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
         else if (v.getId() == minusButton.getId()) {
             feedbackInput.setText(currentFeedback + "-");
         }
-        // Boşluk butonu
-        else if (v.getId() == digitsButtons[4].getId()) {
-            feedbackInput.setText(currentFeedback + " ");
-        }
         // Rakam butonları (1-4)
         else {
             for (int i = 0; i < 4; i++) {
@@ -433,14 +490,12 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     private void submitFeedback() {
         String feedback = feedbackInput.getText().toString();
 
-        // Feedback formatını kontrol et
-        if (!isValidFeedback(feedback)) {
+        // Feedback formatını kontrol et (Farklı formatları kabul ediyoruz)
+        GuessResult result = parseFeedbackFormat(feedback);
+        if (result == null) {
             Toast.makeText(this, R.string.invalid_feedback, Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Feedback'i GuessResult'a dönüştür
-        GuessResult result = parseFeedback(feedback);
 
         // Tutarsız feedback kontrolü
         if (isInconsistentFeedback(result)) {
@@ -466,25 +521,86 @@ public class ComputerGameActivity extends AppCompatActivity implements View.OnCl
     }
 
     /**
-     * Feedback metni geçerli mi kontrol eder
+     * Farklı formatlardaki feedback metinlerini GuessResult nesnesine dönüştürür
+     * Kabul edilen formatlar:
+     * - "+X -Y" (örn: "+1 -2")
+     * - "-X +Y" (örn: "-2 +1")
+     * - "+X" (sadece bulls, örn: "+3")
+     * - "-Y" (sadece cows, örn: "-2")
+     * - "X,Y" (örn: "1,2" - 1 bull, 2 cow)
+     * - "X" (sadece bulls, örn: "2" - 2 bull)
      */
-    private boolean isValidFeedback(String feedback) {
-        // +X -Y formatını kontrol et (örn: +1 -2)
-        if (feedback.matches("\\+[0-4] -[0-4]")) {
-            int bulls = Integer.parseInt(feedback.substring(1, 2));
-            int cows = Integer.parseInt(feedback.substring(4, 5));
-            return bulls + cows <= 4; // Bulls ve cows toplamı 4'ten fazla olamaz
+    private GuessResult parseFeedbackFormat(String feedback) {
+        if (feedback == null || feedback.trim().isEmpty()) {
+            return null;
         }
-        return false;
-    }
 
-    /**
-     * Feedback metnini GuessResult nesnesine dönüştürür
-     */
-    private GuessResult parseFeedback(String feedback) {
-        int bulls = Integer.parseInt(feedback.substring(1, 2));
-        int cows = Integer.parseInt(feedback.substring(4, 5));
-        return new GuessResult(bulls, cows);
+        feedback = feedback.trim();
+
+        // Format: "+X -Y" veya "-X +Y"
+        Pattern pattern1 = Pattern.compile("(\\+|-)([0-4])\\s*(\\+|-)([0-4])");
+        Matcher matcher1 = pattern1.matcher(feedback);
+
+        if (matcher1.matches()) {
+            int bulls = 0;
+            int cows = 0;
+
+            // İlk işaret + ise bulls, - ise cows
+            if (matcher1.group(1).equals("+")) {
+                bulls = Integer.parseInt(matcher1.group(2));
+            } else {
+                cows = Integer.parseInt(matcher1.group(2));
+            }
+
+            // İkinci işaret + ise bulls, - ise cows
+            if (matcher1.group(3).equals("+")) {
+                bulls = Integer.parseInt(matcher1.group(4));
+            } else {
+                cows = Integer.parseInt(matcher1.group(4));
+            }
+
+            // Toplam değer 4'ten büyük olamaz
+            if (bulls + cows <= 4) {
+                return new GuessResult(bulls, cows);
+            }
+
+            return null;
+        }
+
+        // Format: Sadece "+X" (bulls) veya "-X" (cows)
+        Pattern pattern2 = Pattern.compile("(\\+|-)([0-4])");
+        Matcher matcher2 = pattern2.matcher(feedback);
+
+        if (matcher2.matches()) {
+            int value = Integer.parseInt(matcher2.group(2));
+            if (matcher2.group(1).equals("+")) {
+                return new GuessResult(value, 0);
+            } else {
+                return new GuessResult(0, value);
+            }
+        }
+
+        // Format: "X,Y" (X bulls, Y cows)
+        Pattern pattern3 = Pattern.compile("([0-4]),([0-4])");
+        Matcher matcher3 = pattern3.matcher(feedback);
+
+        if (matcher3.matches()) {
+            int bulls = Integer.parseInt(matcher3.group(1));
+            int cows = Integer.parseInt(matcher3.group(2));
+
+            if (bulls + cows <= 4) {
+                return new GuessResult(bulls, cows);
+            }
+
+            return null;
+        }
+
+        // Format: Sadece "X" (X bulls)
+        if (feedback.matches("[0-4]")) {
+            return new GuessResult(Integer.parseInt(feedback), 0);
+        }
+
+        return null;
     }
 
     /**
